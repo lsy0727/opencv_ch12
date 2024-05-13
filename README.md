@@ -1,4 +1,4 @@
-# opencv_ch12
+# opencv_ch12 (레이블링, 외곽선 검출)
 
 opencv_ch12-1
 
