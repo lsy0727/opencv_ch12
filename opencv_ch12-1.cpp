@@ -13,13 +13,15 @@ int main() {
 	Mat labels, stats, centroids;
 	int cnt = connectedComponentsWithStats(bin, labels, stats, centroids);
 
-	double x, y;
+	double x, y;	//ê°ì²´ì˜ ë¬´ê²Œì¤‘ì‹¬ x, yì¢Œí‘œë¥¼ ì„ì‹œë¡œ ì €ì¥í•  ë³€ìˆ˜
+	//max_x, max_y = ë©´ì ì´ ê°€ì¥ í° ê°ì²´ì˜ ë¬´ê²Œì¤‘ì‹¬ x, yì¢Œí‘œ / min_x, min_y = ë©´ì ì´ ê°€ì¥ ì‘ì€ ê°ì²´ì˜ ë¬´ê²Œì¤‘ì‹¬ x, yì¢Œí‘œ
 	double max_x = centroids.at<double>(1, 0), max_y = centroids.at<double>(1, 1), min_x = centroids.at<double>(1, 0), min_y = centroids.at<double>(1, 1);
-	int area;
+	int area;	//ê°ì²´ì˜ ë©´ì ì„ ì„ì‹œë¡œ ì €ì¥í•  ë³€ìˆ˜
+	//max_area = ë©´ì ì´ ê°€ì¥ í° ê°ì²´ì˜ ë©´ì , max = ë©´ì ì´ ê°€ì¥ í° ê°ì²´ì˜ ë ˆì´ë¸” ê°’ / min_area = ë©´ì ì´ ê°€ì¥ ì‘ì€ ê°ì²´ì˜ ë©´ì , min = ë©´ì ì´ ê°€ì¥ ì‘ì€ ê°ì²´ì˜ ë ˆì´ë¸” ê°’
 	int max_area = 0, max = 1, min_area = 0, min = 1;
 	for (int i = 2; i < stats.rows; i++) {
-		x = centroids.at<double>(i, 0);
-		y = centroids.at<double>(i, 1);
+		x = centroids.at<double>(i, 0);	//ë¬´ê²Œì¤‘ì‹¬ xì¢Œí‘œ
+		y = centroids.at<double>(i, 1);	//ë¬´ê²Œì¤‘ì‹¬ yì¢Œí‘œ
 		area = stats.at<int>(i, 4);
 		if (area > max_area) {
 			max_area = area;
@@ -38,10 +40,10 @@ int main() {
 	cvtColor(src, src, COLOR_GRAY2BGR);
 	rectangle(src, Rect(stats.at<int>(min, 0), stats.at<int>(min, 1), stats.at<int>(min, 2), stats.at<int>(min, 3)), Scalar(255, 0, 0));
 	rectangle(src, Rect(stats.at<int>(max, 0), stats.at<int>(max, 1), stats.at<int>(max, 2), stats.at<int>(max, 3)), Scalar(0, 0, 255));
-	cout << "¸éÀûÀÌ ÃÖ´ëÀÎ °´Ã¼ÀÇ ·¹ÀÌºí:" << max << endl;
-	cout << "¹«°ÔÁß½É:(x,y): " << max_x << "\t" << max_y << endl;
-	cout << "¸éÀûÀÌ ÃÖ¼ÒÀÎ °´Ã¼ÀÇ ·¹ÀÌºí:" << min << endl;
-	cout << "¹«°ÔÁß½É:(x,y): " << min_x << "\t" << min_y << endl;
+	cout << "ë©´ì ì´ ìµœëŒ€ì¸ ê°ì²´ì˜ ë ˆì´ë¸”:" << max << endl;
+	cout << "ë¬´ê²Œì¤‘ì‹¬:(x,y): " << max_x << "\t" << max_y << endl;
+	cout << "ë©´ì ì´ ìµœì†Œì¸ ê°ì²´ì˜ ë ˆì´ë¸”:" << min << endl;
+	cout << "ë¬´ê²Œì¤‘ì‹¬:(x,y): " << min_x << "\t" << min_y << endl;
 
 	imshow("src", src);
 	waitKey();
@@ -66,14 +68,14 @@ int main() {
 	Mat labels, stats, centroids;
 	int cnt = connectedComponentsWithStats(bin, labels, stats, centroids);
 
-	cout << "°¹¼ö " << cnt << endl;
+	cout << "ê°¯ìˆ˜ " << cnt << endl;
 	cout << "label\tx\ty\twidth\theight\tarea\tcolor[B,G,R]" << endl;
 
 	for (int i = 1; i < cnt; i++) {
-		double x = centroids.at<double>(i, 0);	//¹«°ÔÁß½É xÁÂÇ¥
-		double y = centroids.at<double>(i, 1);	//¹«°ÔÁß½É yÁÂÇ¥
+		double x = centroids.at<double>(i, 0);	//ë¬´ê²Œì¤‘ì‹¬ xì¢Œí‘œ
+		double y = centroids.at<double>(i, 1);	//ë¬´ê²Œì¤‘ì‹¬ yì¢Œí‘œ
 		rectangle(src, Rect(stats.at<int>(i, 0), stats.at<int>(i, 1), stats.at<int>(i, 2), stats.at<int>(i, 3)), Scalar(0, 255, 255));
-		putText(src, to_string(i), Point(x, y),	//to_string(i) : intÇü º¯¼öÀÎ iÀÇ °ªÀ» stringÀ¸·Î º¯È¯
+		putText(src, to_string(i), Point(x, y),	//to_string(i) : intí˜• ë³€ìˆ˜ì¸ iì˜ ê°’ì„ stringìœ¼ë¡œ ë³€í™˜
 			FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255));
 		cout << i << "\t" << stats.at<int>(i, 0) << "\t" << stats.at<int>(i, 1) << "\t" << stats.at<int>(i, 2) << "\t" << stats.at<int>(i, 3) << "\t" << stats.at<int>(i, 4)
 			<< "\t" << src.at<Vec3b>(y, x) << endl;
@@ -103,9 +105,9 @@ int main() {
 	int cnt = connectedComponentsWithStats(bin, labels, stats, centroids);
 	int xcount, ycount, count;
 	for (int i = 1; i < cnt; i++) {
-		xcount = 0;	//xÁÂÇ¥ ÇÕ ÃÊ±âÈ­
-		ycount = 0;	//yÁÂÇ¥ ÇÕ ÃÊ±âÈ­
-		count = 0;	//ÃÑ ÇÈ¼¿ ¼ö ÃÊ±âÈ­
+		xcount = 0;	//xì¢Œí‘œ í•© ì´ˆê¸°í™”
+		ycount = 0;	//yì¢Œí‘œ í•© ì´ˆê¸°í™”
+		count = 0;	//ì´ í”½ì…€ ìˆ˜ ì´ˆê¸°í™”
 		for (int n = stats.at<int>(i, 1); n < stats.at<int>(i, 1) + stats.at<int>(i, 3); n++) {
 			for (int m = stats.at<int>(i, 0); m < stats.at<int>(i, 0) + stats.at<int>(i, 2); m++) {
 				xcount += m;
@@ -113,8 +115,8 @@ int main() {
 				count++;
 			}
 		}
-		cout << i << "¹ø °´Ã¼ÀÇ ¹«°ÔÁß½É(  Á÷Á¢ °è»ê  ):(" << xcount/(double)count << ", " << ycount/(double)count << ")" << endl;
-		cout << i << "¹ø °´Ã¼ÀÇ ¹«°ÔÁß½É(·¹ÀÌºí¸µ ÇÔ¼ö):(" << centroids.at<double>(i, 0) << "," << centroids.at<double>(i, 1) << ")" << endl << endl;
+		cout << i << "ë²ˆ ê°ì²´ì˜ ë¬´ê²Œì¤‘ì‹¬(  ì§ì ‘ ê³„ì‚°  ):(" << xcount/(double)count << ", " << ycount/(double)count << ")" << endl;
+		cout << i << "ë²ˆ ê°ì²´ì˜ ë¬´ê²Œì¤‘ì‹¬(ë ˆì´ë¸”ë§ í•¨ìˆ˜):(" << centroids.at<double>(i, 0) << "," << centroids.at<double>(i, 1) << ")" << endl << endl;
 	}
 }
 */
@@ -130,29 +132,29 @@ int main() {
 	Mat src_clone = src.clone();
 	Mat labels, stats, centroids;
 
-	namedWindow("ÀÌÁøÈ­ ¿µ»ó");
-	int pos = 0;	//ÀÌÁøÈ­ ¿µ»óÀÇ ÀÓ°è°ª
-	createTrackbar("threshold", "ÀÌÁøÈ­ ¿µ»ó", &pos, 255);
+	namedWindow("ì´ì§„í™” ì˜ìƒ");
+	int pos = 0;	//ì´ì§„í™” ì˜ìƒì˜ ì„ê³„ê°’
+	createTrackbar("threshold", "ì´ì§„í™” ì˜ìƒ", &pos, 255);
 
 	while (true) {
 		imshow("src", src);
 		src = src_clone.clone();
 
 		Mat gray, blurring, dx;
-		cvtColor(src, gray, COLOR_BGR2GRAY);	//±×·¹ÀÌ º¯È¯
-		blur(gray, blurring, Size(5, 5));	//5x5 ºí·¯¸µ
-		Sobel(blurring, dx, CV_32FC1, 1, 0);	//xÃà ¹æÇâ Æí¹ÌºĞ
-		dx.convertTo(dx, CV_8UC1);	//8ºñÆ® 1Ã¤³Î ¿µ»óÀ¸·Î º¯È¯
-		imshow("xÃà ¹æÇâ ¼Òº§", dx);
+		cvtColor(src, gray, COLOR_BGR2GRAY);	//ê·¸ë ˆì´ ë³€í™˜
+		blur(gray, blurring, Size(5, 5));	//5x5 ë¸”ëŸ¬ë§
+		Sobel(blurring, dx, CV_32FC1, 1, 0);	//xì¶• ë°©í–¥ í¸ë¯¸ë¶„
+		dx.convertTo(dx, CV_8UC1);	//8ë¹„íŠ¸ 1ì±„ë„ ì˜ìƒìœ¼ë¡œ ë³€í™˜
+		imshow("xì¶• ë°©í–¥ ì†Œë²¨", dx);
 
 		Mat bin;
-		threshold(dx, bin, pos, 255, THRESH_BINARY);	//ÀÌÁøÈ­
-		imshow("ÀÌÁøÈ­ ¿µ»ó", bin);
+		threshold(dx, bin, pos, 255, THRESH_BINARY);	//ì´ì§„í™”
+		imshow("ì´ì§„í™” ì˜ìƒ", bin);
 
 		Mat close;
-		Mat rect = getStructuringElement(MORPH_RECT, Size(30, 5));	//5Çà 50¿­ÀÇ »ç°¢Çü ±¸Á¶ ¿ä¼Ò
-		morphologyEx(bin, close, MORPH_CLOSE, rect, Point(-1,-1));	//´İÈû ¿¬»ê
-		imshow("´İÈû ¿¬»ê", close);
+		Mat rect = getStructuringElement(MORPH_RECT, Size(30, 5));	//5í–‰ 50ì—´ì˜ ì‚¬ê°í˜• êµ¬ì¡° ìš”ì†Œ
+		morphologyEx(bin, close, MORPH_CLOSE, rect, Point(-1,-1));	//ë‹«í˜ ì—°ì‚°
+		imshow("ë‹«í˜ ì—°ì‚°", close);
 
 		int cnt = connectedComponentsWithStats(close, labels, stats, centroids);
 		int max = stats.at<int>(1, 4);
