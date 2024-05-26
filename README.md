@@ -73,3 +73,5 @@ opencv_ch12-2
   3) 무게중심을 구하기위해 connectedComponentsWithStats()함수를 사용(stats : 통계 정보를 담은 행렬, centroids : 무게 중심 좌표를 담은 행렬)
   4) 객체가 열려있는 방향을 구하기 위해 무게중심을 구함(pt_x에 x 좌표 저장 - 좌우방향만 구하기 때문에 x좌표만 저장함)
   5) 무게중심이 객체의 중앙을 기준으로 왼쪽에 있는지 오른쪽에 있는지 구분, 외곽선 그리기
+
+![image](https://github.com/lsy0727/opencv_ch12/assets/92630416/dd83be45-3e22-49c3-a21c-5bcf9b7f8beb)
