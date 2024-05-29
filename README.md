@@ -104,4 +104,28 @@ opencv_chap12-3
 ![image](https://github.com/lsy0727/opencv_ch12/assets/92630416/dd572973-82d3-4c5f-bc21-b898460ed893)
 
 3 - 영상 파일에서 삼각형, 사각형, 오각형, 육각형, 원의 개수를 각각 구하여 출력, 모든 도형의 외곽선을 그림
-  1) 
+  1) 영상 레이블링 수행
+  2) 외곽선 검출
+  3) 도형의 외곽선을 그림
+  4) 면적이 400미만일 경우 노이즈로 간주하고 무시함
+  5) 외곽선을 근사화한 점들의 좌표를 저장하고, 점의 개수를 비교함
+      for (vector<Point> pts : contours){}
+      = for (int i = 0; i < contours.size(); i++) { vecor<Point> pts = conturs[i]; }
+
+![image](https://github.com/lsy0727/opencv_ch12/assets/92630416/31d022bd-c7c6-4ad9-8f5f-147f0881e0e0)
+
+
+4 - 영상 파일에서 사각형, 원, 삼각형의 면적과 외곽선의 길이를 구하고 출력
+  1) 영상 레이블링 수행, 외곽선 검출
+  2) approxPolyDP() : 외곽선을 근사화
+  3) arcLength() : 외곽선의 길이를 구함, 마지막 요소가 true일 경우 폐곡선(첫번째 점과 마지막 점을 연결함)
+  4) contourArea() : 외곽선의 면적을 구함
+
+![image](https://github.com/lsy0727/opencv_ch12/assets/92630416/55762a7a-4c3b-4666-9ea4-58653380b2cc)
+
+5 - 영상 파일에서 외곽선을 검출하고 빨간색으로 그리기, 외곽선을 근사화하고 파란색으로 그리기, 길이와 면적 콘솔창에 출력
+  1) 영상 레이블링, 외곽선 검출, 빨간색으로 그림
+  2) 근사화 오차를 각각 0.02, 0.002로 설정한 후 근사화하고, 외곽선을 그림
+       오차가 작아질수록 원에 가까워짐(원래 점의 위치와 근사화된 점의 위치가 가까워지기 때문임)
+     
+![image](https://github.com/lsy0727/opencv_ch12/assets/92630416/cb592c4e-bac5-4cf7-b15a-c7c1f9efea40)
