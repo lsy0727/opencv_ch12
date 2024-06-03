@@ -1,231 +1,115 @@
-//1¹ø
-/*
 #include<iostream>
 #include<opencv2/opencv.hpp>
 using namespace std;
 using namespace cv;
+
+Mat img(500, 900, CV_8UC3, Scalar(255, 255, 255));	//3ì±„ë„ ì»¬ëŸ¬ì˜ìƒ
+Mat img_size(500 / 5, 200, CV_8UC3, Scalar(255, 255, 255));
+Point ptOld;
+string file_name;
+
+void on_mouse(int event, int x, int y, int flags, void*);	//ë§ˆìš°ìŠ¤ ì´ë²¤íŠ¸
+void img_UI(Mat& img);	//ì˜ìƒ UI ê·¸ë¦¬ê¸° í•¨ìˆ˜
+
 int main() {
-	Mat src = imread("beta.png");
+	img_UI(img);	//UIê·¸ë¦¬ê¸° í•¨ìˆ˜ í˜¸ì¶œ
 
-	Mat gray, bin;
-	src = ~src;
-	cvtColor(src, gray, COLOR_BGR2GRAY);
-	threshold(gray, bin, 0, 255, THRESH_BINARY | THRESH_OTSU);
+	namedWindow("img");
+	setMouseCallback("img", on_mouse);	//ë§ˆìš°ìŠ¤ì´ë²¤íŠ¸ í•¨ìˆ˜ í˜¸ì¶œ
 
-	vector<vector<Point>> contours;
-	findContours(bin, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);	//¹Ù±ùÂÊ ¿Ü°û¼± °ËÃâ
-	//¹Ù¿îµù ¹Ú½º ±×¸®±â
-	Rect boundingBox = boundingRect(contours[0]);
-	rectangle(src, boundingBox, Scalar(0, 0, 255), 1);
-
-	RotatedRect minR = minAreaRect(contours[0]);	//0¹ø °´Ã¼¿¡ ´ëÇÑ »ç°¢ÇüÀÇ Á¤º¸
-	Point2f pts[4];	//²ÀÁşÁ¡ 4°³ ÁÂÇ¥
-	minR.points(pts);	//Á¤º¸ÀÔ·Â
-	//ÃÖ¼Ò¸éÀû»ç°¢Çü
-	for (int i = 0; i < 4; i++) {
-		line(src, pts[i], pts[(i + 1) % 4], Scalar(255, 0, 0), 1);
-	}
-
-	Point2f center;
-	float radius;
-	//ÃÖ¼Ò¸éÀû ¿ø
-	minEnclosingCircle(contours[0], center, radius);	//0¹ø °´Ã¼¿¡ ´ëÇÑ ¿øÀÇ Áß½É ÁÂÇ¥, ¹İÁö¸§À» ±¸ÇÔ
-	circle(src, center, radius, Scalar(0, 255, 255), 1);
-
-	imshow("result", src);
-	imshow("bin", bin);
-	waitKey();
-	return 0;
-}
-*/
-
-//2¹ø
-/*
-#include<iostream>
-#include<opencv2/opencv.hpp>
-using namespace std;
-using namespace cv;
-int main() {
-	Mat src = imread("rotateda.bmp");
-	Mat gray, bin, rev;
-	cvtColor(src, gray, COLOR_BGR2GRAY);
-	threshold(gray, bin, 0, 255, THRESH_BINARY | THRESH_OTSU);
-	rev = ~bin;
-
-	vector<vector<Point>> contours;
-	findContours(rev, contours, RETR_LIST, CHAIN_APPROX_NONE);
-
-	RotatedRect minR = minAreaRect(contours[1]);
-	float angle = minR.angle;
-
-	Point2f center;
-	float radius;
-	minEnclosingCircle(contours[1], center, radius);
-	Mat M = getRotationMatrix2D(center, angle, 1);
-
-	Mat dst;
-	warpAffine(src, dst, M, Size(), INTER_LINEAR, BORDER_REPLICATE);
-
-	imshow("src", src);
-	imshow("dst", dst);
-	waitKey();
-	return 0;
-}
-*/
-
-//3¹ø
-/*
-#include<iostream>
-#include<opencv2/opencv.hpp>
-using namespace std;
-using namespace cv;
-int main() {
-	Mat img = imread("shapes.png");
-
-	Mat gray, bin, rev;
-	cvtColor(img, gray, COLOR_BGR2GRAY);
-	threshold(gray, bin, 0, 255, THRESH_BINARY | THRESH_OTSU);
-	rev = ~bin;
-
-	vector<vector<Point>> contours;
-	findContours(rev, contours, RETR_LIST, CHAIN_APPROX_NONE);
-
-	for (int i = 0; i < contours.size(); i++) {
-		drawContours(img, contours, i, Scalar(0, 0, 255), 2);
-	}
-
-	int triangle = 0, rectangle = 0, pentagon = 0, hexagon = 0, circle = 0;
-	for (vector<Point> pts : contours) {	//contours ¿ä¼ÒÀÇ ¼ö¸¸Å­ ¹İº¹ÇÔ, ¿Ü°û¼±À» pts¿¡ º¹»ç
-		if (contourArea(pts) < 400)continue;	//¸éÀûÀÌ 400¹Ì¸¸ÀÌ¸é ¹«½Ã
-
-		vector<Point> approx;
-		approxPolyDP(pts, approx, arcLength(pts, true) * 0.02, true);	//¿Ü°û¼±À» ±Ù»çÈ­(Á¡ÀÇ °³¼ö¸¦ ÁÙÀÓ)
-
-		int vtc = (int)approx.size();	//±Ù»çÈ­µÈ ¿Ü°û¼±ÀÇ ²ÀÁşÁ¡ °³¼ö
-		if (vtc == 3) { triangle++; }
-		else if (vtc == 4) { rectangle++; }
-		else if (vtc == 5) { pentagon++; }
-		else if (vtc == 6) { hexagon++; }
-		else {
-			double len = arcLength(pts, true);	//¿Ü°û¼± µÑ·¹ ±æÀÌ
-			double area = contourArea(pts);	//¿Ü°û¼±ÀÇ ¸éÀû
-			double ratio = 4. * CV_PI * area / (len * len);	//ÀÌ»óÀûÀÎ ¿øÀÏ¼ö·Ï 1¿¡ °¡±î¿ò
-			if (ratio > 0.85) { circle++; }	//0.85º¸´Ù Å©¸é ¿øÀ¸·Î °£ÁÖ
-		}
-	}
-	cout << "»ï°¢ÇüÀÇ °¹¼ö:" << triangle << endl;
-	cout << "»ç°¢ÇüÀÇ °¹¼ö:" << rectangle << endl;
-	cout << "¿À°¢ÇüÀÇ °¹¼ö:" << pentagon << endl;
-	cout << "À°°¢ÇüÀÇ °¹¼ö:" << hexagon << endl;
-	cout << "¿øÀÇ °¹¼ö:" << circle << endl;
 	imshow("img", img);
 	waitKey();
 	return 0;
 }
-*/
 
-//4¹ø
-/*
-#include<iostream>
-#include<opencv2/opencv.hpp>
-using namespace std;
-using namespace cv;
-int main() {
-	Mat src = imread("polygon2.bmp");
-	Mat gray, bin, rev;
-	cvtColor(src, gray, COLOR_BGR2GRAY);
-	threshold(gray, bin, 0, 255, THRESH_BINARY | THRESH_OTSU);
-	rev = ~bin;
-
-	vector<vector<Point>> contours;
-	findContours(rev, contours, RETR_LIST, CHAIN_APPROX_NONE);
-
-	double trilen = 0, rectlen = 0, cirlen = 0;
-	double triarea = 0, rectarea = 0, cirarea = 0;
-	for (vector<Point> pts : contours) {	//contours ¿ä¼ÒÀÇ ¼ö¸¸Å­ ¹İº¹ÇÔ, ¿Ü°û¼±À» pts¿¡ º¹»ç
-		static int count = 0;
-		drawContours(src, contours, count++, Scalar(0, 0, 255), 2);	//¿Ü°û¼± ±×¸®±â
-
-		if (contourArea(pts) < 400)continue;	//¸éÀûÀÌ 400¹Ì¸¸ÀÌ¸é ¹«½Ã
-
-		vector<Point> approx;	//±Ù»çÈ­µÈ ´Ù°¢ÇüÀÇ ²ÀÁşÁ¡ ÀúÀå
-		approxPolyDP(pts, approx, arcLength(pts, true) * 0.02, true);	//¿Ü°û¼±À» ±Ù»çÈ­(Á¡ÀÇ °³¼ö¸¦ ÁÙÀÓ)
-
-		int vtc = (int)approx.size();	//±Ù»çÈ­µÈ ¿Ü°û¼±ÀÇ ²ÀÁşÁ¡ °³¼ö
-		if (vtc == 3) {
-			trilen = arcLength(pts, true);	//ture : Æó°î¼±, Ã¹¹øÂ° Á¡°ú ¸¶Áö¸· Á¡À» ¿¬°áÇÔ
-			triarea = contourArea(pts);
+void on_mouse(int event, int x, int y, int flags, void*) {
+	imshow("img", img);
+	Rect rect_area[] = {
+		Rect(0, 0, 500, 500),	//ì…ë ¥ì°½ ì˜ì—­
+		Rect(501, 0, 199, 99),	//save ì˜ì—­
+		Rect(501, 500 / 5 + 1, 199, 99),	//load ì˜ì—­
+		Rect(501, 500 * 2 / 5 + 1, 199, 99),	//clear ì˜ì—­
+		Rect(501, 500 * 3 / 5 + 1, 199, 99),	//run ì˜ì—­
+		Rect(501, 500 * 4 / 5 + 1, 199, 99),	//exit ì˜ì—­
+		Rect(700, 0, 199, 99)	//contour ì˜ì—­
+	};
+	switch (event) {
+	case EVENT_LBUTTONDOWN:
+		ptOld = Point(x, y);
+		if (rect_area[1].contains(ptOld)) {	//save
+			cout << "save press" << endl;
+			cout << "ì €ì¥í•  íŒŒì¼ëª…ì„ ì…ë ¥ : ";
+			getline(cin, file_name);
+			Mat save_img = img(Rect(0, 0, 500, 500));
+			imwrite(file_name, save_img);
 		}
-		else if (vtc == 4) {
-			rectlen = arcLength(pts, true);
-			rectarea = contourArea(pts);
+		else if (rect_area[2].contains(ptOld)) {	//load
+			cout << "load press" << endl;
+			cout << "ë¶ˆëŸ¬ì˜¬ íŒŒì¼ëª…ì„ ì…ë ¥ : ";
+			getline(cin, file_name);
+			Mat load_img = imread(file_name);
+			load_img.copyTo(img(Rect(0, 0, 500, 500)));
 		}
-		else {
-			double len = arcLength(pts, true);	//¿Ü°û¼± µÑ·¹ ±æÀÌ
-			double area = contourArea(pts);	//¿Ü°û¼±ÀÇ ¸éÀû
-			double ratio = 4. * CV_PI * area / (len * len);	//ÀÌ»óÀûÀÎ ¿øÀÏ¼ö·Ï 1¿¡ °¡±î¿ò
-			if (ratio > 0.85) {	//0.85º¸´Ù Å©¸é ¿øÀ¸·Î °£ÁÖ
-				cirlen = len;
-				cirarea = area;
+		else if (rect_area[3].contains(Point(x, y))) {	//clear
+			cout << "clear press" << endl;
+			rectangle(img, Rect(0, 0, 501, 501), Scalar(255, 255, 255), -1);
+		}
+		else if (rect_area[4].contains(Point(x, y))) {	//run
+			cout << "run press" << endl;
+			
+		}
+		else if (rect_area[5].contains(Point(x, y))) {	//exit
+			cout << "exit press" << endl;
+			cout << "í”„ë¡œê·¸ë¨ ì¢…ë£Œ" << endl;
+			exit(0);	//ì¢…ë£Œ
+		}
+		else if (rect_area[6].contains(Point(x, y))) {	//contour
+			cout << "contour press" << endl;
+
+			Mat contour_img = img(Rect(0, 0, 500, 500));
+			Mat gray, bin, rev;
+
+			cvtColor(contour_img, gray, COLOR_BGR2GRAY);
+			threshold(gray, bin, 0, 255, THRESH_BINARY | THRESH_OTSU);
+			rev = ~bin;
+			vector<vector<Point>> contours;
+			findContours(rev, contours, RETR_LIST, CHAIN_APPROX_NONE);
+
+			cout << "ì™¸ê°ì„  ê°¯ìˆ˜ : " << contours.size() << endl;
+		}
+		break;
+	case EVENT_MOUSEMOVE:
+		if (rect_area[0].contains(Point(x, y))) {
+			if (flags & EVENT_FLAG_LBUTTON) {
+				line(img, ptOld, Point(x, y), Scalar(0, 0, 0), 5);
+				ptOld = Point(x, y);
 			}
 		}
-
+		break;
 	}
-	cout << "¿øÀÇ µÑ·¹ ±æÀÌ:" << cirlen << endl;
-	cout << "¿øÀÇ ¸éÀû:" << cirarea << endl;
-	cout << "»ï°¢ÇüÀÇ µÑ·¹ ±æÀÌ:" << trilen << endl;
-	cout << "»ï°¢ÇüÀÇ ¸éÀû:" << triarea << endl;
-	cout << "»ç°¢ÇüÀÇ µÑ·¹ ±æÀÌ:" << rectlen << endl;
-	cout << "»ç°¢ÇüÀÇ ¸éÀû:" << rectarea << endl;
-
-	imshow("src", src);
-	waitKey();
-	return 0;
 }
-*/
+void img_UI(Mat& img) {
+	//ì¹¸ ë‚˜ëˆ„ê¸°
+	line(img, Point(502, 0), Point(502, 500), Scalar(0, 0, 0), 2);
+	line(img, Point(700, 0), Point(700, 500), Scalar(0, 0, 0), 2);
+	for (int i = 1; i < 5; i++) {
+		line(img, Point(502, 500 * i / 5), Point(700, 500 * i / 5), Scalar(0, 0, 0), 2);
+		line(img, Point(700, 500 * i / 5), Point(900, 500 * i / 5), Scalar(0, 0, 0), 2);
+	}
 
-//5¹ø
-/*
-#include<iostream>
-#include<opencv2/opencv.hpp>
-using namespace std;
-using namespace cv;
-int main() {
-	Mat src = imread("ellipse.png");
-	Mat copy_src = src.clone();
-	Mat gray, bin, rev;
-	cvtColor(src, gray, COLOR_BGR2GRAY);
-	threshold(gray, bin, 0, 255, THRESH_BINARY | THRESH_OTSU);
-	rev = ~bin;
-
-	vector<vector<Point>> contours;
-	findContours(rev, contours, RETR_LIST, CHAIN_APPROX_NONE);
-	drawContours(copy_src, contours, 0, Scalar(0, 0, 255), 2);	//¿Ü°û¼± - »¡°£»ö
-	Mat dst1 = copy_src.clone();	//±Ù»çÈ­ ¿ÀÂ÷ 0.02ÀÏ¶§ ¿Ü°û¼±À» ±×¸± ¿µ»ó
-	Mat dst2 = copy_src.clone();	//±Ù»çÈ­ ¿ÀÂ÷ 0.002ÀÏ¶§ ¿Ü°û¼±À» ±×¸± ¿µ»ó
-
-
-	vector<vector<Point>> approx(2);	//±Ù»çÈ­µÈ ´Ù°¢ÇüÀÇ ²ÀÁşÁ¡ ÀúÀå
-	Mat approx_src = dst1;
-	float mag = 0.02;	//±Ù»çÈ­ ¿ÀÂ÷ ÃÊ±â°ª 0.02
+	//UIì„¤ê³„
+	vector<vector<string>> text = { {"Save", "Load", "Clear", "Run", "Exit"},
+		{"contour", "feature2", "feature3", "feature4", "feafure5"} };
+	int fontface = FONT_HERSHEY_SIMPLEX;	//í°íŠ¸ ì¢…ë¥˜
+	double fontscale = 1.0;	//í°íŠ¸ í¬ê¸°
+	int thickness = 2;	//ê¸€ì”¨ ë‘ê»˜
 	for (int i = 0; i < 2; i++) {
-		approxPolyDP(contours[0], approx[i], arcLength(contours[0], true) * mag, true);	//¿Ü°û¼±À» ±Ù»çÈ­(Á¡ÀÇ °³¼ö¸¦ ÁÙÀÓ), ¿ÀÂ÷°¡ ÀÛ¾ÆÁú¼ö·Ï ±âÁ¸ ¿Ü°û¼±¿¡ °¡±î¿öÁü
-		for (int j = 0; j < approx[i].size(); j++) {
-			line(approx_src, approx[i][j], approx[i][(j + 1) % approx[i].size()], Scalar(255, 0, 0), 2);	//±Ù»çÈ­µÈ ¿Ü°û¼± - ÆÄ¶õ»ö
+		for (int j = 0; j < 5; j++) {
+			Size TextSize = getTextSize(text[i][j], fontface, fontscale, thickness, 0);	//ê¸€ì”¨ í¬ê¸°
+			Size imgsize = img_size.size();	//ê°ì²´ ì‚¬ì´ì¦ˆ
+			Point org(500 + i * 200 + (imgsize.width - TextSize.width) / 2,
+				500 * j / 5 + (imgsize.height + TextSize.height) / 2);
+			putText(img, text[i][j], org, fontface, fontscale, Scalar(0, 0, 0), thickness);
 		}
-		approx_src = dst2;
-		mag = 0.002;	//±Ù»çÈ­ ¿ÀÂ÷ 0.002·Î ¼³Á¤
 	}
-
-	cout << "¿Ü°û¼±±æÀÌ:" << arcLength(contours[0], true) << endl;
-	cout << "¿Ü°û¼± ¸éÀû:" << contourArea(contours[0]) << endl;
-	cout << "±Ù»çÈ­µÈ ¿Ü°û¼±ÀÇ ±æÀÌ:" << arcLength(approx[0], true) << endl;
-	cout << "±Ù»çÈ­µÈ ¿Ü°û¼± ¸éÀû:" << contourArea(approx[0]) << endl;
-
-	imshow("src", src);
-	imshow("dst1", dst1);
-	imshow("dst2", dst2);
-	waitKey();
-	return 0;
 }
-*/
